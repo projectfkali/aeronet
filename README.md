@@ -1,81 +1,102 @@
 <div align="center">
-  <img src="assets/icon.png" width="128" alt="AeroNet Logo">
-  
-  <h1>AeroNet Wi-Fi Optimizer 🚀</h1>
-  <p><strong>Akıllı, Yerel ve Profesyonel Wi-Fi Ağ Optimizasyon Aracı</strong></p>
 
-  <p>
-    <a href="https://github.com/merta/AeroNet/releases"><img src="https://img.shields.io/badge/Versiyon-2.0.0-blue.svg?style=for-the-badge&color=06b6d4" alt="Version"></a>
-    <a href="https://nodejs.org"><img src="https://img.shields.io/badge/Platform-Windows-lightgrey.svg?style=for-the-badge&logo=windows&color=0f172a" alt="Windows"></a>
-    <a href="https://electronjs.org/"><img src="https://img.shields.io/badge/Electron-Desktop-darkblue.svg?style=for-the-badge&logo=electron&color=4f46e5" alt="Electron"></a>
-    <a href="LICENSE"><img src="https://img.shields.io/badge/Lisans-MIT-green.svg?style=for-the-badge&color=10b981" alt="License"></a>
-  </p>
+<img src="assets/icon.png" width="160" alt="AeroNet Logo">
+
+# 🚀 AeroNet Wi-Fi Optimizer
+
+**Akıllı, Yerel ve Profesyonel Ağ Optimizasyon & Teşhis Aracı**
+
+<br/>
+
+[![Version](https://img.shields.io/badge/Versiyon-2.0.0-blue.svg?style=for-the-badge&color=06b6d4&logo=aer-lingus)](#)
+[![Windows](https://img.shields.io/badge/Platform-Windows-lightgrey.svg?style=for-the-badge&logo=windows&color=0f172a)](#)
+[![Electron](https://img.shields.io/badge/Altyapı-Electron-darkblue.svg?style=for-the-badge&logo=electron&color=4f46e5)](#)
+[![License](https://img.shields.io/badge/Lisans-MIT-green.svg?style=for-the-badge&color=10b981)](#)
+
+<br/>
+
+> *AeroNet, profesyonel ağ analizi yapan, kanal çakışmalarını tespit eden ve fiziksel engelleri hesaplayarak size en uygun modem ayarlarını sunan tam donanımlı bir **Windows Masaüstü** uygulamasıdır.*
+
 </div>
 
 ---
 
-AeroNet, profesyonel ağ analizi yapan, kanal çakışmalarını tespit eden ve fiziksel engelleri hesaplayarak size en uygun modem ayarlarını sunan bağımsız bir **Windows Masaüstü** (Electron) uygulamasıdır.
+### 💎 "Glassmorphism" Arayüzü
+Geleneksel, sıkıcı ağ teşhis araçlarını unutun. AeroNet, verileri okumayı kolaylaştıran saydam katmanlar, bulanık cam efektleri (blur) ve zarif iç gölgelerden oluşan "Premium" bir arayüze sahiptir. Sadece sorunları çözmekle kalmaz, bunu görsel bir şölene dönüştürür.
 
-Premium "Glassmorphism" tasarımıyla ağ verilerini okumayı sadece kolaylaştırmakla kalmaz, aynı zamanda görsel bir şölene dönüştürür.
-
-<div align="center">
-  <img src="https://via.placeholder.com/800x450/0f172a/06b6d4?text=AeroNet+Ana+Ekran+G%C3%B6r%C3%BCnt%C3%BCs%C3%BC+Buraya" alt="AeroNet Ekran Görüntüsü" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1)">
-</div>
+<br/>
 
 ## ✨ Öne Çıkan Özellikler
 
-*   📡 **Canlı Spektrum Analizi:** Çevrenizdeki tüm Wi-Fi ağlarını (2.4GHz & 5GHz) tarar, kanal doluluk oranlarını puanlar.
-*   🗺️ **İnteraktif Isı Haritası (Heatmap):** Evinizin krokisini çizip modeminizi yerleştirerek beton, cam veya alçıpan duvarlardan geçen sinyalin simülasyonunu yapın.
-*   🧠 **İnce Ayar Hesaplayıcı:** Kullanım senaryonuza (Oyun, Akıllı Ev, Dengeli) ve fiziksel ağınıza göre RTS Threshold, Beacon Interval ve DTIM ayarlarını hesaplar.
-*   📊 **Geçmiş & Trend Veritabanı:** Dahili veri tabanı sayesinde son 7 güne ait Wi-Fi kanalı kullanım trendlerini izler.
-*   ⚠️ **Akıllı Uyarı Sistemi:** Ağınızda potansiyel bir *Evil Twin* (Şeytani İkiz) saldırısı tespit edilirse veya sinyal gücünüz çok düşerse Windows üzerinden anında bildirim alırsınız.
-*   💾 **Tamamen Yerel:** Verileriniz buluta gitmez, tüm analizler ve geçmiş veritabanı kendi bilgisayarınızda (`~/.aeronet/`) barındırılır.
+> **Tamamen Yerel:** Verileriniz asla buluta gitmez. Tüm analizleriniz ve geçmiş veri tabanınız bilgisayarınızın derinliklerinde, güvenle saklanır.
+
+| Özellik | Detaylar |
+| :--- | :--- |
+| 📡 **Canlı Spektrum Analizi** | Çevrenizdeki tüm Wi-Fi ağlarını (2.4GHz & 5GHz) tarar, kanal doluluk oranlarını yapay zeka destekli algoritmayla puanlar. |
+| 🗺️ **İnteraktif Isı Haritası** | Evinizin krokisini çizin, modeminizi yerleştirin ve beton/alçıpan duvarlardan geçen sinyalin simülasyonunu anında görün. |
+| 🧠 **İnce Ayar Hesaplayıcı** | Oyun, Akıllı Ev veya Dengeli senaryolarına göre *RTS Threshold*, *Beacon Interval* ve *DTIM* ayarlarınızı optimize eder. |
+| 📊 **Geçmiş & Trend Analizi** | Dahili NoSQL (NeDB) veritabanı ile son 7 güne ait Wi-Fi kanal doluluk trendlerini şık grafiklerle izleyin. |
+| ⚠️ **Akıllı Uyarı Sistemi** | Ağınızda olası bir **Evil Twin (Şeytani İkiz)** saldırısı tespit edilirse Windows bildirim merkezinden anında uyarılırsınız. |
+
+<br/>
 
 ## 🚀 Kurulum & Çalıştırma
 
-### Bağımsız Kullanım (.exe)
-Eğer doğrudan uygulamayı kullanmak istiyorsanız, **[Releases](#)** sayfasından en güncel `AeroNet-WiFi-Optimizer-Portable.exe` dosyasını indirip çalıştırabilirsiniz. Kurulum gerektirmez!
+### 🔌 Hızlı Başlangıç (Bağımsız Kullanım)
+Teknik detaylarla uğraşmak istemiyorsanız, sadece tek tıkla çalıştırabilirsiniz. Kurulum gerektirmez!
+1. **[Releases](#)** sayfamıza gidin.
+2. En güncel `AeroNet-WiFi-Optimizer-Portable.exe` dosyasını indirin.
+3. Çift tıklayın ve optimizasyona başlayın!
 
-### Geliştirici Ortamı Kurulumu
-Kaynak kodundan derlemek isterseniz:
+### 💻 Geliştirici Ortamı Kurulumu
+Kaynak kodunu derlemek ve kendi sürümünüzü oluşturmak isterseniz:
 
 ```bash
 # Projeyi klonlayın
-git clone https://github.com/kullaniciadiniz/AeroNet.git
+git clone https://github.com/projectfkali/aeronet.git
 
 # Klasöre girin
-cd AeroNet
+cd aeronet
 
-# Gerekli kütüphaneleri yükleyin
+# Bağımlılıkları yükleyin
 npm install
 
-# Geliştirme modunda başlatın
+# Geliştirici modunda başlatın
 npm start
 
-# Kendi .exe dosyanızı oluşturun
+# Windows için kendi bağımsız .exe'nizi paketleyin
 npm run dist
 ```
 
-## 🛠️ Teknolojiler
-*   **Electron:** Native Windows masaüstü entegrasyonu.
-*   **Node.js:** Arka plan işlemleri ve ağ taramaları (`netsh wlan`).
-*   **NeDB:** Yerel, hafif, JSON tabanlı NoSQL veritabanı.
-*   **Vanilla JS & CSS:** Framework bağımsız, saf performans ve özel "Glassmorphic" CSS tasarımı.
-*   **Chart.js:** Dinamik ve interaktif veri görselleştirmesi.
+<br/>
+
+## 🛠️ Mimari & Teknolojiler
+Bu proje, modern web teknolojilerinin gücünü yerel işletim sistemi yetenekleriyle birleştiren hibrit bir altyapıya sahiptir.
+
+*   ⚡ **Electron:** Native pencereli Windows masaüstü deneyimi.
+*   🟢 **Node.js:** Arka plan işlemleri, TCP/UDP analizleri ve ağ taramaları (`netsh wlan`).
+*   🗄️ **NeDB:** Yerel, hafif ve son derece hızlı JSON tabanlı NoSQL veritabanı.
+*   🎨 **Vanilla JS & Özel CSS:** Herhangi bir ağır framework olmadan saf performans ve özel "Glassmorphic" mimari.
+*   📈 **Chart.js:** Dinamik veri trendlerinin kusursuz görselleştirmesi.
+
+<br/>
 
 ## 🤝 Katkıda Bulunun
-AeroNet tamamen açık kaynaklıdır. Özellik istekleri, hata bildirimleri veya yeni modül fikirleri için lütfen [Issues](#) bölümünü kullanın veya Pull Request gönderin.
 
-1. Projeyi Fork'layın
-2. Yeni bir dal (branch) oluşturun (`git checkout -b ozellik/YeniHarikaOzellik`)
-3. Değişikliklerinizi commit'leyin (`git commit -m 'Yeni harika özellik eklendi'`)
-4. Dalınıza push'layın (`git push origin ozellik/YeniHarikaOzellik`)
-5. Bir Pull Request açın!
+AeroNet gücünü topluluktan alır. Kod tabanını inceleyin, özellikleri test edin ve gelişmesine yardımcı olun!
 
-## 📜 Lisans
-Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır. Detaylar için LICENSE dosyasına göz atabilirsiniz.
+1. Bu projeyi **Fork**'layın.
+2. Kendinize yeni bir dal oluşturun: `git checkout -b ozellik/YeniFikriniz`
+3. Değişikliklerinizi işleyin: `git commit -m 'Harika bir özellik ekledim'`
+4. Değişiklikleri gönderin: `git push origin ozellik/YeniFikriniz`
+5. Bir **Pull Request (PR)** açın!
+
+<br/>
+
+## 📜 Lisans & Telif
+Bu proje **[MIT Lisansı](LICENSE)** ile güvence altına alınmıştır. Dilediğiniz gibi kullanabilir, değiştirebilir ve dağıtabilirsiniz. Daha fazla detay için LICENSE dosyasına göz atın.
 
 ---
 <div align="center">
-  <sub><a href="https://github.com/kullaniciadiniz">Kullanıcı Adınız</a> tarafından ❤️ ile geliştirildi.</sub>
+  <sub>❤️ ile açık kaynak topluluğu için geliştirilmiştir.</sub>
 </div>
