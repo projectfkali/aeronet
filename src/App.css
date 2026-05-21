@@ -1,0 +1,84 @@
+/* App.css - Bridging legacy styles */
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+.sidebar {
+  width: 250px;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.brand h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--cyan);
+}
+
+.brand span {
+  color: var(--primary);
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+nav a {
+  padding: 15px 20px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+  color: var(--text-secondary);
+}
+
+nav a:hover, nav a.active {
+  background: rgba(6, 182, 212, 0.1);
+  color: var(--cyan);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.content-area {
+  padding: 30px;
+  flex: 1;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+th {
+  color: var(--text-secondary);
+  font-weight: 500;
+}

@@ -1,24 +1,15 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
-// Renderer process'e güvenli şekilde Electron API'yi açıyoruz
-contextBridge.exposeInMainWorld('electronAPI', {
-  // Uygulama Bilgisi
-  getVersion: () => ipcRenderer.invoke('get-app-version'),
-
-  // Auto-Launch (Windows başlangıcı)
-  getAutoLaunch: () => ipcRenderer.invoke('get-auto-launch'),
-  setAutoLaunch: (enabled) => ipcRenderer.invoke('set-auto-launch', enabled),
-
-  // Native Bildirimler
-  showNotification: (opts) => ipcRenderer.invoke('show-notification', opts),
-
-  // Pencere Kontrolleri
-  minimizeToTray: () => ipcRenderer.invoke('minimize-to-tray'),
-  quitApp: () => ipcRenderer.invoke('quit-app'),
-
-  // Harici Link
+contextBridge.exposeInMainWorld('api', {
+  scanWifi: () => ipcRenderer.invoke('scan-wifi'),
+  getSettings: () => ipcRenderer.invoke('get-settings'),
+  saveSettings: (data) => ipcRenderer.invoke('save-settings', data),
+  getHistory: () => ipcRenderer.invoke('get-history'),
+  saveHistory: (data) => ipcRenderer.invoke('save-scan-history', data),
+  
+  showNotification: (options) => ipcRenderer.invoke('show-notification', options),
   openExternal: (url) => ipcRenderer.invoke('open-external', url),
-
-  // Electron ortamında olup olmadığını kontrol
-  isElectron: true
+  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+  minimizeToTray: () => ipcRenderer.invoke('minimize-to-tray'),
+  quitApp: () => ipcRenderer.invoke('quit-app')
 });

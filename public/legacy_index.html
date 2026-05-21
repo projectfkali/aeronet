@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroNet - Wi-Fi Analiz ve Kanal Optimizasyon Aracı</title>
+  <!-- SEO & Fonts -->
+  <meta name="description" content="AeroNet yerel Wi-Fi ortamınızı analiz ederek en ideal kanal ayarlarını önerir ve ev içi sinyal yayılımını simüle eder.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+  <!-- Arka Plan Parlama Efektleri (Ambient Glow Elements) -->
+  <div class="ambient-glow bg-glow-1"></div>
+  <div class="ambient-glow bg-glow-2"></div>
+  <div class="ambient-glow bg-glow-3"></div>
+
+  <!-- Ana Uygulama Düzeni -->
+  <div class="app-container">
+    
+    <!-- SOL SIDEBAR (NAVİGASYON) -->
+    <aside class="sidebar" id="main-sidebar">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="logo-svg">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <circle cx="12" cy="20" r="1" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h1>AeroNet</h1>
+          <span>Wi-Fi Optimizer</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-menu">
+        <a href="#dashboard" class="menu-item active" id="btn-dashboard">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+          Genel Durum
+        </a>
+        <a href="#spectrum" class="menu-item" id="btn-spectrum">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          Kanal Spektrumu
+        </a>
+        <a href="#heatmap" class="menu-item" id="btn-heatmap">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          Isı Haritası Simülatörü
+        </a>
+        <a href="#finetuning" class="menu-item" id="btn-finetuning">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+          İnce Ayar Hesaplayıcı
+        </a>
+        <a href="#recommendations" class="menu-item" id="btn-recommendations">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          Optimizasyon Rehberi
+        </a>
+        <a href="#history" class="menu-item" id="btn-history">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          Geçmiş Analizi
+        </a>
+
+        <a href="#settings" class="menu-item" id="btn-settings">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Ayarlar
+        </a>
+      </nav>
+
+      <div class="sidebar-status-card">
+        <div class="status-indicator">
+          <span class="status-dot green" id="status-dot"></span>
+          <span class="status-text" id="status-text">Sunucu Bağlantısı Aktif</span>
+        </div>
+        <div class="mode-badge" id="scan-mode-badge">
+          <span>Yerel Canlı Tarama</span>
+        </div>
+        <button class="btn btn-primary btn-scan-now" id="btn-scan-trigger">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-spin"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+          Şimdi Tara
+        </button>
+      </div>
+    </aside>
+
+    <!-- SAĞ ANA İÇERİK ALANI -->
+    <main class="main-content">
+      
+      <!-- TOP HEADER (ÜST ÇUBUK) -->
+      <header class="top-header">
+        <div class="page-title-area">
+          <h2 id="current-page-title">Genel Durum</h2>
+          <p id="current-page-subtitle">Yerel Wi-Fi ağları ve genel durum parametreleri</p>
+        </div>
+        
+        <!-- Hızlı Ağ Durumu Göstergesi -->
+        <div class="header-network-indicator" id="header-network-card">
+          <div class="wifi-wave-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" id="header-wifi-svg">
+              <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+              <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+              <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+              <circle cx="12" cy="20" r="1" fill="currentColor"></circle>
+            </svg>
+          </div>
+          <div class="network-details">
+            <span class="label">BAĞLI OLUNAN AĞ</span>
+            <span class="value" id="header-connected-ssid">Tarama yapılıyor...</span>
+          </div>
+          <div class="network-badge" id="header-connected-signal">--%</div>
+        </div>
+      </header>
+
+      <!-- İÇERİK PANELLERİ (SPA SEKMELERİ) -->
+      <div class="content-body">
+        
+        <!-- ================= DASHBOARD SAYFASI ================= -->
+        <section id="panel-dashboard" class="content-panel active">
+          <!-- Hızlı İstatistik Kartları -->
+          <div class="stats-grid">
+            <div class="stat-card card-glow-indigo">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              </div>
+              <div class="stat-content">
+                <h3>Bulunan Toplam Ağ</h3>
+                <div class="value-row">
+                  <span class="number" id="stat-total-networks">0</span>
+                  <span class="badge badge-info" id="stat-networks-ratio">Yüksek Yoğunluk</span>
+                </div>
+                <p class="desc">Çevrede tespit edilen aktif BSSID yayını</p>
+              </div>
+            </div>
+
+            <div class="stat-card card-glow-cyan">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              </div>
+              <div class="stat-content">
+                <h3>Önerilen En İyi Kanallar</h3>
+                <div class="value-row">
+                  <span class="channels" id="stat-best-channels">--</span>
+                  <span class="badge badge-success">Optimal</span>
+                </div>
+                <p class="desc" id="stat-best-channels-desc">2.4 GHz ve 5 GHz en temiz frekanslar</p>
+              </div>
+            </div>
+
+            <div class="stat-card card-glow-emerald">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+              </div>
+              <div class="stat-content">
+                <h3>Sinyal Kararlılık Oranı</h3>
+                <div class="value-row">
+                  <span class="number" id="stat-stability-pct">--%</span>
+                  <span class="badge badge-warning" id="stat-stability-status">Normal</span>
+                </div>
+                <p class="desc">Parazit oranına göre hesaplanan ağ kalitesi</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Canlı Ağ Listesi ve Öneriler Yan Yana -->
+          <div class="dashboard-grid">
+            
+            <!-- Canlı Ağ Listesi Kartı -->
+            <div class="content-card list-card">
+              <div class="card-header">
+                <h3>Çevredeki Wi-Fi Ağları</h3>
+                <span class="badge" id="scan-time-indicator">Son Tarama: Az önce</span>
+              </div>
+              
+              <div class="table-container">
+                <table class="networks-table">
+                  <thead>
+                    <tr>
+                      <th>Ağ Adı (SSID)</th>
+                      <th>Sinyal Gücü</th>
+                      <th>Kanal</th>
+                      <th>Frekans Bandı</th>
+                      <th>Protokol</th>
+                      <th>Güvenlik</th>
+                    </tr>
+                  </thead>
+                  <tbody id="networks-table-body">
+                    <!-- Javascript ile doldurulacak -->
+                    <tr>
+                      <td colspan="6" class="table-placeholder">
+                        <div class="spinner-container">
+                          <div class="spinner"></div>
+                          <span>Wi-Fi ağları taranıyor...</span>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Sağdaki Optimizasyon Özeti -->
+            <div class="content-card summary-card">
+              <div class="card-header">
+                <h3>Akıllı Kanal Durumu</h3>
+              </div>
+              
+              <div class="current-channel-state">
+                <div class="channel-grade-donut">
+                  <svg viewBox="0 0 36 36" class="circular-chart indigo">
+                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                    <path class="circle" stroke-dasharray="85, 100" id="channel-grade-arc" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+                    <text x="18" y="20.35" class="percentage" id="channel-grade-text">A+</text>
+                  </svg>
+                </div>
+                <div class="channel-status-details">
+                  <h4 id="channel-status-title">Mükemmel Kanal Seçimi!</h4>
+                  <p id="channel-status-desc">Mevcut yönlendirici kanalınız en az çakışmaya sahip bölgede bulunuyor. Değişikliğe gerek olmayabilir.</p>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <h4 class="section-title">Hızlı Öneriler</h4>
+              <ul class="quick-tips-list" id="quick-tips-dashboard">
+                <li>
+                  <span class="bullet emerald"></span>
+                  <div class="tip-body">
+                    <strong>2.4 GHz Ayarı:</strong> 11. kanaldaki parazit çok yüksek, 1. veya 6. kanala geçiş yapmanız önerilir.
+                  </div>
+                </li>
+                <li>
+                  <span class="bullet indigo"></span>
+                  <div class="tip-body">
+                    <strong>5 GHz Genişliği:</strong> Çevrede çok fazla 5G ağ var. Kanal genişliğini 80MHz yerine 40MHz yaparak kararlılığı artırabilirsiniz.
+                  </div>
+                </li>
+                <li>
+                  <span class="bullet warning"></span>
+                  <div class="tip-body">
+                    <strong>Router Konumu:</strong> Sinyal kaybınız yüksek. Cihazınızı yerden en az 1.5m yüksekte ve merkezi bir konumda tutun.
+                  </div>
+                </li>
+              </ul>
+
+              <button class="btn btn-secondary w-full" id="btn-go-to-spectrum">
+                Detaylı Analizi Gör
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 8px;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </div>
+            
+          </div>
+
+          <!-- PREMIUM EKLEMELER: Canlı Ping / Jitter ve Siber Tehdit Kalkanı (ADIM 2) -->
+          <div class="premium-dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+            
+            <!-- Canlı Ping & Jitter Kartı -->
+            <div class="content-card card-glow-indigo" id="ping-card">
+              <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>Canlı Gecikme & Jitter Analizi</h3>
+                <span class="badge badge-info" id="ping-realtime-badge">Aktif İzleme</span>
+              </div>
+              <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                <div style="flex: 1; text-align: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px;">
+                  <span style="font-size: 0.8rem; color: var(--text-secondary); display: block;">ORTALAMA PİNG</span>
+                  <strong id="ping-latency-val" style="font-size: 1.6rem; color: var(--cyan); font-family: var(--font-title);">-- ms</strong>
+                </div>
+                <div style="flex: 1; text-align: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px;">
+                  <span style="font-size: 0.8rem; color: var(--text-secondary); display: block;">JITTER (SAPMA)</span>
+                  <strong id="ping-jitter-val" style="font-size: 1.6rem; color: var(--violet); font-family: var(--font-title);">-- ms</strong>
+                </div>
+                <div style="flex: 1; text-align: center; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px;">
+                  <span style="font-size: 0.8rem; color: var(--text-secondary); display: block;">PAKET KAYBI</span>
+                  <strong id="ping-loss-val" style="font-size: 1.6rem; color: var(--crimson); font-family: var(--font-title);">--%</strong>
+                </div>
+              </div>
+              <div class="canvas-container" style="height: 120px; position: relative; margin-top: 10px;">
+                <canvas id="ping-canvas" width="600" height="120" style="width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);"></canvas>
+              </div>
+              <p class="desc" id="ping-diagnosis-desc" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 10px;">Ağ gecikmesi ve dalgalanma taranıyor...</p>
+            </div>
+
+            <!-- Siber Tehdit & Evil Twin Kalkanı -->
+            <div class="content-card card-glow-crimson" id="security-card">
+              <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>Güvenlik Kalkanı & Tehdit Algılama</h3>
+                <span class="badge badge-success" id="security-status-badge">Ağınız Güvende</span>
+              </div>
+              <div id="security-alerts-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 170px; overflow-y: auto; padding-right: 5px; margin-top: 10px;">
+                <div class="security-placeholder" style="text-align: center; padding: 20px 10px; color: var(--text-secondary); font-size: 0.85rem;">
+                  <svg viewBox="0 0 24 24" width="36" height="36" stroke="var(--emerald)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 10px auto; display: block;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                  <p>Kablosuz paketler taranıyor... Rogue AP veya Evil Twin sinyali algılanmadı.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ================= KANAL SPEKTRUMU SAYFASI ================= -->
+        <section id="panel-spectrum" class="content-panel">
+          <div class="spectrum-controls">
+            <div class="tab-buttons">
+              <button class="tab-btn active" id="btn-band-24">2.4 GHz Spektrumu</button>
+              <button class="tab-btn" id="btn-band-5">5 GHz Spektrumu</button>
+            </div>
+            <div class="graph-legend">
+              <span class="legend-item"><span class="legend-dot current"></span>Kendi Ağınız</span>
+              <span class="legend-item"><span class="legend-dot other"></span>Diğer Ağlar</span>
+            </div>
+          </div>
+
+          <!-- Spektrum Grafik Kartı -->
+          <div class="content-card graph-card">
+            <div class="card-header">
+              <h3 id="spectrum-graph-title">2.4 GHz Frekans Bandı Çakışma Analizi</h3>
+              <p class="graph-subtitle">Parabollerin kesişim alanları parazit (interference) miktarını gösterir. Alçak dalgalar daha zayıf sinyalleri temsil eder.</p>
+            </div>
+            <div class="canvas-container">
+              <canvas id="spectrum-canvas" width="1000" height="350"></canvas>
+            </div>
+          </div>
+
+          <!-- Kanal Derecelendirme Listesi -->
+          <div class="channels-rating-grid">
+            <div class="content-card rating-card">
+              <div class="card-header">
+                <h3>Kanal Puanları & Analiz Sonucu</h3>
+              </div>
+              <div class="channels-rating-list" id="channels-rating-list">
+                <!-- Javascript ile doldurulacak -->
+              </div>
+            </div>
+
+            <div class="content-card analysis-card">
+              <div class="card-header">
+                <h3>Neden Önemli?</h3>
+              </div>
+              <div class="analysis-content">
+                <div class="info-block">
+                  <h5>CCI (Co-Channel Interference - Aynı Kanal Paraziti)</h5>
+                  <p>Aynı kanalı kullanan yönlendiriciler, birbirlerinin yayını bitene kadar sırasını bekler. Bu da gecikmeye (ping) ve hız kaybına yol açar. Telsiz gibi sırayla konuşulur.</p>
+                </div>
+                <div class="info-block">
+                  <h5>ACI (Adjacent-Channel Interference - Komşu Kanal Çakışması)</h5>
+                  <p>2.4 GHz bandındaki kanallar birbirinin üzerine biner. Örneğin, 3. kanalı seçmek, hem 1 hem de 6. kanaldan gürültü almanıza neden olur. Bu yüzden 2.4 GHz'de **yalnızca 1, 6 ve 11.** kanallar kullanılmalıdır!</p>
+                </div>
+                <div class="info-block">
+                  <h5>5 GHz Farkı</h5>
+                  <p>5 GHz bandında kanallar geniştir ve birbirinin üzerine binmez. Çok daha fazla temiz kanal seçeneği ve daha düşük parazit riski barındırır, ancak menzili daha kısadır.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= HEATMAP SİMÜLATÖRÜ SAYFASI ================= -->
+        <section id="panel-heatmap" class="content-panel">
+          <div class="heatmap-editor-layout">
+            
+            <!-- Sol Kumanda Paneli -->
+            <div class="content-card editor-controls">
+              <div class="card-header">
+                <h3>Simülatör Kontrolleri</h3>
+              </div>
+
+              <!-- Araçlar Bölümü -->
+              <div class="control-group">
+                <span class="control-label">ETKİN ARAÇ</span>
+                <div class="tool-selector">
+                  <button class="tool-btn active" id="btn-tool-router">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><circle cx="12" cy="20" r="1" fill="currentColor"></circle></svg>
+                    Modem Yerleştir
+                  </button>
+                  <button class="tool-btn" id="btn-tool-wall">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    Duvar Çiz
+                  </button>
+                </div>
+              </div>
+
+              <!-- Duvar Tipi Seçimi -->
+              <div class="control-group" id="wall-type-selector" style="display:none;">
+                <span class="control-label">DUVAR MALZEMESİ (ENGEL)</span>
+                <div class="material-list">
+                  <label class="material-item">
+                    <input type="radio" name="wall-material" value="concrete" checked>
+                    <span class="material-indicator concrete"></span>
+                    <span class="material-info">
+                      <strong>Beton Duvar</strong>
+                      <span class="sub">Yüksek sinyal kaybı (-15 dBm)</span>
+                    </span>
+                  </label>
+                  <label class="material-item">
+                    <input type="radio" name="wall-material" value="drywall">
+                    <span class="material-indicator drywall"></span>
+                    <span class="material-info">
+                      <strong>Alçıpan / Tuğla</strong>
+                      <span class="sub">Hafif sinyal kaybı (-4 dBm)</span>
+                    </span>
+                  </label>
+                  <label class="material-item">
+                    <input type="radio" name="wall-material" value="glass">
+                    <span class="material-indicator glass"></span>
+                    <span class="material-info">
+                      <strong>Kalın Cam / Metal</strong>
+                      <span class="sub">Orta sinyal kaybı (-8 dBm)</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Sinyal Bandı -->
+              <div class="control-group">
+                <span class="control-label">SİMÜLE FREKANS BANDI</span>
+                <div class="radio-toggle-group">
+                  <button class="toggle-btn active" id="btn-sim-24">2.4 GHz</button>
+                  <button class="toggle-btn" id="btn-sim-5">5 GHz (Daha Hızlı Azalır)</button>
+                </div>
+              </div>
+
+              <!-- Temizle ve Hazır Şablonlar -->
+              <div class="control-group">
+                <span class="control-label">ŞABLON VE EYLEMLER</span>
+                <div class="actions-row">
+                  <button class="btn btn-secondary btn-sm" id="btn-load-flat">Daire Krokisi Yükle</button>
+                  <button class="btn btn-danger btn-sm" id="btn-clear-canvas">Krokiyi Sıfırla</button>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <!-- Canlı Konum Metrikleri -->
+              <div class="live-metrics-panel">
+                <h4>Fiziksel Ölçüm İpuçları</h4>
+                <div class="metric-row">
+                  <span class="m-label">Mevcut Çekim Gücü:</span>
+                  <span class="m-val" id="metric-signal">-45 dBm (Harika)</span>
+                </div>
+                <div class="metric-row">
+                  <span class="m-label">Tahmini Bağlantı Hızı:</span>
+                  <span class="m-val" id="metric-speed">300 Mbps</span>
+                </div>
+                <p class="simulator-hint">
+                  Fareyi evin içinde hareket ettirerek farklı odalardaki sinyal zayıflamasını ve performans kayıplarını canlı olarak izleyebilirsiniz.
+                </p>
+              </div>
+
+              <!-- Çok Katlı Ev Kontrolleri (ADIM 4) -->
+              <div class="divider"></div>
+              <div class="control-group">
+                <span class="control-label">AKTİF KAT KATMANI</span>
+                <div class="floor-selector" style="display: flex; gap: 8px; margin-bottom: 10px;">
+                  <button class="btn btn-secondary btn-sm flex-1 active" id="btn-floor-0" style="padding: 6px; font-size: 0.75rem;">Zemin Kat</button>
+                  <button class="btn btn-secondary btn-sm flex-1" id="btn-floor-1" style="padding: 6px; font-size: 0.75rem;">1. Kat (Dubleks)</button>
+                  <button class="btn btn-secondary btn-sm flex-1" id="btn-floor-2" style="padding: 6px; font-size: 0.75rem;">2. Kat</button>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(139, 92, 246, 0.08); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.2);">
+                  <span style="font-size: 0.8rem; color: var(--text-primary); font-weight: 500; display: flex; align-items: center; gap: 6px;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--violet)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-pulse"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                    3D Hologram Modu
+                  </span>
+                  <label class="switch" style="position: relative; display: inline-block; width: 40px; height: 20px;">
+                    <input type="checkbox" id="toggle-3d-mode" style="opacity: 0; width: 0; height: 0;">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Mobil QR ve Senkronizasyon (ADIM 3) -->
+              <div class="divider"></div>
+              <div class="control-group" id="mobile-sync-card">
+                <span class="control-label">Masaüstü - Mobil Senkronizasyon</span>
+                <div style="display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                  <div id="qrcode-container" style="background: white; padding: 4px; border-radius: 4px; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <svg viewBox="0 0 29 29" width="48" height="48" style="shape-rendering: crispEdges; fill: #0f172a;">
+                      <path d="M0 0h7v7H0zm1 1h5v5H1zm2 2h1v1H3zm12-3h7v7h-7zm1 1h5v5h-5zm2 2h1v1H18zM0 15h7v7H0zm1 1h5v5H1zm2 2h1v1H3zm20 0h3v1h-3zm-2-3h3v1h-3zm2 5h4v4h-4zm1 1h2v2h-2zm-9-3h1v2h-1zm3 0h2v1h-2zm2-2h1v1h-1zm-6 2h1v1h-1zm4 2h1v1h-1zm-7-5h1v1h-1zm3 0h1v1h-1zm2 0h1v1h-1zm3 2h2v1h-2zm0-4h2v1h-2zm-3 2h1v1h-1zm1 2h1v1h-1zm4 1h1v1h-1zm-9 1h1v2h-1zm3 0h1v1h-1zm2 0h1v1h-1zm-8 4h3v1H9zm6 0h2v1h-2zm3 0h3v1h-3z"/>
+                    </svg>
+                  </div>
+                  <div style="flex: 1;">
+                    <h5 style="margin: 0 0 2px 0; font-size: 0.8rem; color: var(--text-primary);">Mobil Sinyal Ölçer</h5>
+                    <p style="margin: 0; font-size: 0.65rem; color: var(--text-secondary); line-height: 1.2;">Cihazdan <a href="mobile.html" target="_blank" style="color: var(--cyan); font-weight: 600; text-decoration: underline;">mobile.html</a> açın.</p>
+                    <span id="mobile-sync-status" class="badge" style="font-size: 0.6rem; padding: 2px 6px; margin-top: 4px; display: inline-block; background: rgba(239, 68, 68, 0.1); color: var(--crimson);">Bağlantı Yok</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Sağdaki Kavis Çizim Alanı (Canvas Grid) -->
+            <div class="content-card canvas-card flex-1">
+              <div class="card-header">
+                <h3>Ev Planı ve Sinyal Yayılım Isı Haritası</h3>
+                <span class="badge badge-info" id="sim-status">Modem Sürüklenebilir</span>
+              </div>
+              <div class="canvas-wrapper">
+                <!-- Sinyal Isı Haritası Çizim Canvası -->
+                <canvas id="heatmap-canvas" width="700" height="500"></canvas>
+                <!-- Üzerindeki Talimatlar -->
+                <div class="canvas-instructions" id="canvas-instructions">
+                  <span>Modeminizi sürükleyerek sinyal kalitesini test edebilirsiniz.<br><strong>Duvar Çiz</strong> aracını kullanarak yeni engeller oluşturabilirsiniz.</span>
+                  <button class="btn btn-primary btn-sm" id="btn-dismiss-instruction">Anladım</button>
+                </div>
+              </div>
+              <div class="canvas-footer-legend">
+                <span class="c-legend"><span class="c-box signal-high"></span>Mükemmel (> -50 dBm)</span>
+                <span class="c-legend"><span class="c-box signal-mid"></span>Orta (-50 / -75 dBm)</span>
+                <span class="c-legend"><span class="c-box signal-low"></span>Zayıf (-75 / -90 dBm)</span>
+                <span class="c-legend"><span class="c-box signal-none"></span>Ölü Nokta (< -90 dBm)</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ================= İNCE AYAR HESAPLAYICI SAYFASI ================= -->
+        <section id="panel-finetuning" class="content-panel">
+          <div class="finetuning-intro">
+            <div class="intro-card content-card">
+              <h3>Dinamik İnce Ayar Kontrol Paneli</h3>
+              <p>Wi-Fi ağınızın havada paket çarpışmasını engellemek, mobil cihazların şarj süresini uzatmak ve sinyal kararlılığını artırmak için modem arayüzünüzde uygulayabileceğiniz gizli ince ayarlar.</p>
+              <div class="scenario-selector-container">
+                <span class="selector-label">AĞ KULLANIM ÖNCELİĞİNİZ:</span>
+                <div class="scenario-buttons">
+                  <button class="scenario-btn active" id="btn-scen-gaming">🎮 Oyun & Düşük Gecikme</button>
+                  <button class="scenario-btn" id="btn-scen-balanced">⚖️ Dengeli Kullanım</button>
+                  <button class="scenario-btn" id="btn-scen-iot">🔋 Güç Tasarrufu & IoT</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modem Tanıma ve Uyum Asistanı Kartı (PREMIUM!) -->
+            <div class="intro-card content-card card-glow-cyan" style="margin-top: 15px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <div style="flex: 1; min-width: 250px;">
+                  <h4 style="margin: 0 0 5px 0; display: flex; align-items: center; gap: 8px; font-family: var(--font-title); font-size: 1.1rem; color: var(--text-primary);">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="logo-svg" style="color: var(--cyan);"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="10" y1="6" x2="10.01" y2="6"></line><line x1="14" y1="6" x2="14.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line><line x1="10" y1="18" x2="10.01" y2="18"></line><line x1="14" y1="18" x2="14.01" y2="18"></line></svg>
+                    Modem Tanıma & Uyum Asistanı
+                  </h4>
+                  <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">Bağlı olduğunuz ağın donanım imzası ve SSID kalıpları taranarak modem markanız analiz edilir.</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <span id="detected-modem-badge" class="badge badge-info" style="font-size: 0.75rem; padding: 6px 12px; border-radius: 6px;">Modem Taranıyor...</span>
+                  <select id="select-modem-brand" class="custom-select" style="background: rgba(15, 23, 42, 0.6); color: var(--text-primary); border: 1px solid rgba(255, 255, 255, 0.1); padding: 8px 12px; border-radius: 8px; font-family: var(--font-body); font-weight: 600; cursor: pointer; outline: none; transition: all 0.3s; font-size: 0.85rem;">
+                    <option value="detect">🔍 Otomatik Tanı</option>
+                    <option value="tplink">TP-Link</option>
+                    <option value="asus">ASUS Router</option>
+                    <option value="keenetic">Keenetic</option>
+                    <option value="zyxel">ZyXEL</option>
+                    <option value="airties">Airties</option>
+                    <option value="huawei">Huawei / Superonline</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- OPTİMİZASYONU MODEME GÖNDER BUTONU (ADIM 5) -->
+            <div style="margin-top: 15px; display: flex; justify-content: flex-end;">
+              <button class="btn btn-primary" id="btn-push-config" style="display: flex; align-items: center; gap: 8px; font-family: var(--font-title); font-weight: 700; background: linear-gradient(135deg, var(--cyan) 0%, var(--indigo) 100%); border: none; box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); text-transform: uppercase; font-size: 0.85rem; padding: 10px 20px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-pulse"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                Optimizasyonu Modeme Gönder
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Hesaplanan Kadranlar / Metrikler -->
+          <div class="finetuning-metrics-grid">
+            
+            <!-- RTS/CTS -->
+            <div class="content-card metric-tweak-card card-glow-indigo">
+              <div class="tweak-header">
+                <h4>RTS/CTS Eşik Değeri</h4>
+                <span class="badge" id="badge-tweak-rts-status">Sakin Ortam</span>
+              </div>
+              <div class="tweak-display">
+                <span class="tweak-value" id="val-tweak-rts">2347</span>
+                <span class="tweak-unit">Bytes</span>
+              </div>
+              <div class="tweak-slider-indicator">
+                <div class="tweak-progress-bar" id="bar-tweak-rts" style="width: 100%;"></div>
+              </div>
+              <div class="tweak-info">
+                <p>Paket çarpışmalarını (Hidden Node) önleme ayarı. Yoğun apartman ortamlarında bu değerin düşürülmesi ping dalgalanmalarını keser.</p>
+                <div class="tweak-comparison">
+                  <span>Varsayılan: 2347</span>
+                  <span class="sep">|</span>
+                  <strong id="desc-tweak-rts">Önerilen: 2347 (Değişiklik Gerekmiyor)</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- DTIM Interval -->
+            <div class="content-card metric-tweak-card card-glow-cyan">
+              <div class="tweak-header">
+                <h4>DTIM Aralığı (Interval)</h4>
+                <span class="badge badge-success">Düşük Ping</span>
+              </div>
+              <div class="tweak-display">
+                <span class="tweak-value" id="val-tweak-dtim">1</span>
+                <span class="tweak-unit">Önbellek</span>
+              </div>
+              <div class="tweak-slider-indicator">
+                <div class="tweak-progress-bar" id="bar-tweak-dtim" style="width: 33.3%;"></div>
+              </div>
+              <div class="tweak-info">
+                <p>İstemci cihazların uykudan uyanıp modemdeki paket kuyruğunu kontrol etme sıklığı. Düşük değerler gecikmeyi azaltır, yüksek değerler şarj korur.</p>
+                <div class="tweak-comparison">
+                  <span>Varsayılan: 1 veya 2</span>
+                  <span class="sep">|</span>
+                  <strong id="desc-tweak-dtim">Önerilen: 1 (Anlık Paket İletimi)</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Beacon Interval -->
+            <div class="content-card metric-tweak-card card-glow-emerald">
+              <div class="tweak-header">
+                <h4>Beacon Sıklığı (Interval)</h4>
+                <span class="badge badge-info">Kararlı</span>
+              </div>
+              <div class="tweak-display">
+                <span class="tweak-value" id="val-tweak-beacon">100</span>
+                <span class="tweak-unit">ms</span>
+              </div>
+              <div class="tweak-slider-indicator">
+                <div class="tweak-progress-bar" id="bar-tweak-beacon" style="width: 83.3%;"></div>
+              </div>
+              <div class="tweak-info">
+                <p>Modeminizin varlığını bildirmek için çevreye gönderdiği sinyal paketlerinin milisaniye cinsinden aralığı. 100ms standarttır.</p>
+                <div class="tweak-comparison">
+                  <span>Varsayılan: 100</span>
+                  <span class="sep">|</span>
+                  <strong id="desc-tweak-beacon">Önerilen: 100 ms</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Guard Interval -->
+            <div class="content-card metric-tweak-card card-glow-violet">
+              <div class="tweak-header">
+                <h4>Guard Interval (GI)</h4>
+                <span class="badge" id="badge-tweak-gi">Menzil Öncelikli</span>
+              </div>
+              <div class="tweak-display">
+                <span class="tweak-value" id="val-tweak-gi">800ns</span>
+                <span class="tweak-unit">Süre</span>
+              </div>
+              <div class="tweak-slider-indicator">
+                <div class="tweak-progress-bar" id="bar-tweak-gi" style="width: 100%;"></div>
+              </div>
+              <div class="tweak-info">
+                <p>Wi-Fi paketleri arasındaki bekleme tampon süresi. Güçlü sinyalde bu süreyi kısaltarak doğrudan %11 ekstra hız alabilirsiniz.</p>
+                <div class="tweak-comparison">
+                  <span>Varsayılan: Auto / 800</span>
+                  <span class="sep">|</span>
+                  <strong id="desc-tweak-gi">Önerilen: 800ns (Long GI)</strong>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Diğer İnce Ayarlar & Uyarılar (MIMO, ATF, DFS) -->
+          <div class="finetuning-advanced-grid">
+            <div class="content-card">
+              <div class="card-header">
+                <h3>Ek Donanım ve Protokol İnce Ayarları</h3>
+              </div>
+              <div class="advanced-tweaks-list">
+                
+                <div class="adv-tweak-item">
+                  <div class="tweak-icon-badge" id="icon-tweak-atf">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                  </div>
+                  <div class="adv-tweak-desc">
+                    <h5>Airtime Fairness (Hava Süresi Adaleti)</h5>
+                    <p id="desc-adv-atf">Çevrede eski 802.11g/n ağlar var. Evinizdeki eski nesil cihazların hızlı cihazları yavaşlatmasını önlemek için modemin kablosuz ayarlarından Airtime Fairness modunu Açık (Enabled) yapın.</p>
+                  </div>
+                </div>
+
+                <div class="adv-tweak-item">
+                  <div class="tweak-icon-badge" id="icon-tweak-dfs">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                  </div>
+                  <div class="adv-tweak-desc">
+                    <h5>DFS Radar Uyarısı & 5G Kararlılık</h5>
+                    <p id="desc-adv-dfs">Mevcut 5 GHz bağlantınız bulunmuyor veya radar çakışması olmayan kanallarda çalışıyor. Bir radar çakışması riski görünmüyor.</p>
+                  </div>
+                </div>
+
+                <div class="adv-tweak-item">
+                  <div class="tweak-icon-badge emerald">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                  </div>
+                  <div class="adv-tweak-desc">
+                    <h5>MU-MIMO ve Beamforming (Hüzmeleme)</h5>
+                    <p>Çoklu anten teknolojisi. Modeminizde bu ayarlar varsa kesinlikle Açık (Enabled) yapın. Sinyal dalgaları odadaki cihazlarınıza nokta atışı yönlendirilir.</p>
+                  </div>
+                </div>
+
+                <div class="adv-tweak-item" id="tweak-brand-item" style="display: none;">
+                  <div class="tweak-icon-badge info" id="icon-tweak-brand">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  </div>
+                  <div class="adv-tweak-desc">
+                    <h5 id="title-adv-brand">Modeme Özel Donanım Notu</h5>
+                    <p id="desc-adv-brand">Modem markanıza göre tespit edilen özel donanım ve stabilite önerileri burada görüntülenecektir.</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Modem Kılavuzu (Accordion) -->
+            <div class="content-card interface-guide-card">
+              <div class="card-header">
+                <h3>Modem Arayüzünde Bu Ayarlar Nerede?</h3>
+              </div>
+              <div class="accordion-container">
+                
+                <div class="accordion-item" id="accordion-tplink">
+                  <button class="accordion-trigger">
+                    <span>TP-Link Modemler</span>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="arrow"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <div class="accordion-content">
+                    <p>Giriş yaptıktan sonra Gelişmiş (Advanced) > Kablosuz (Wireless) > Kablosuz Ayarları (Wireless Settings) adımlarını takip edin. Sayfanın en altında yer alan Gelişmiş Ayarlar (Advanced Settings) butonuna tıklayarak; RTS Threshold, Beacon Interval ve DTIM ayarlarına ulaşabilirsiniz.</p>
+                  </div>
+                </div>
+
+                <div class="accordion-item" id="accordion-asus">
+                  <button class="accordion-trigger">
+                    <span>ASUS Routerlar</span>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="arrow"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <div class="accordion-content">
+                    <p>Yönetici panelinde sol menuüdeki Gelişmiş Ayarlar (Advanced Settings) altından Kablosuz (Wireless) sekmesine girin. Üstteki sekmelerden en sağda yer alan Profesyonel (Professional) sekmesine geçin. Burada RTS Threshold, DTIM, Beacon Interval ve Airtime Fairness ayarlarını topluca göreceksiniz.</p>
+                  </div>
+                </div>
+
+                <div class="accordion-item" id="accordion-keenetic">
+                  <button class="accordion-trigger">
+                    <span>Keenetic Modemler</span>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="arrow"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <div class="accordion-content">
+                    <p>Sol menüden Ev Ağı (Home Network) sekmesine girin. Kullandığınız Wi-Fi bandını (2.4G veya 5G) seçip Gelişmiş Ayarları Göster (Show Advanced Settings) linkine tıklayın. Alt bölümlerde RTS/CTS, DTIM ve Short GI ayar kutularını düzenleyebilirsiniz.</p>
+                  </div>
+                </div>
+
+                <div class="accordion-item" id="accordion-zyxel">
+                  <button class="accordion-trigger">
+                    <span>ZyXEL Modemler</span>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="arrow"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <div class="accordion-content">
+                    <p>Arayüze girdikten sonra Ağ Ayarı (Network Setting) > Kablosuz (Wireless) adımlarını takip edin. Üst kısımdaki Diğerleri (Others) veya Gelişmiş (Advanced) sekmesine tıklayarak; RTS Eşiği (RTS Threshold), DTIM Aralığı ve Kısa GI (Short GI) seçeneklerine ulaşabilirsiniz.</p>
+                  </div>
+                </div>
+
+                <div class="accordion-item" id="accordion-airties">
+                  <button class="accordion-trigger">
+                    <span>Airties Modemler</span>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="arrow"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <div class="accordion-content">
+                    <p>Kablosuz > Kablosuz Ağ Ayarları adımlarını takip edin. Sayfanın sağ tarafındaki Gelişmiş Ayarlar seçeneğine tıklayın. Dikey açılan menüden Beacon Aralığı, DTIM Eşiği, RTS Eşiği ve Airtime Fairness ayarlarına ulaşabilirsiniz.</p>
+                  </div>
+                </div>
+
+                <div class="accordion-item" id="accordion-huawei">
+                  <button class="accordion-trigger">
+                    <span>Huawei & Superonline Modemler</span>
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="arrow"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <div class="accordion-content">
+                    <p>Kablosuz Ağ (Wi-Fi Network) > Kablosuz Gelişmiş Ayarlar (Wi-Fi Advanced Settings) sekmesine geçin. Sayfa altında RTS Eşiği, DTIM Aralığı, Beacon Süresi ve Guard Interval (GI) seçeneklerini görebilir, değiştirebilirsiniz.</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= OPTİMİZASYON REHBERİ SAYFASI ================= -->
+        <section id="panel-recommendations" class="content-panel">
+          <div class="recommendations-container">
+            
+            <!-- Adım Adım Yapılacaklar -->
+            <div class="content-card flex-2">
+              <div class="card-header">
+                <h3>Adım Adım Wi-Fi Ayarlarını Optimize Etme Rehberi</h3>
+              </div>
+              <div class="guide-steps">
+                
+                <div class="guide-step">
+                  <div class="step-num">01</div>
+                  <div class="step-content">
+                    <h4>Modem/Router Arayüzüne Giriş Yapın</h4>
+                    <p id="guide-login-ip-desc">Uygulamamızın önerdiği kanalları ayarlamak için modeminizin yönetim paneline girmelisiniz. Çoğu modem için bu adres tarayıcınızın adres çubuğuna yazacağınız <strong>192.168.1.1</strong>, <strong>192.168.1.2</strong> veya <strong>192.168.2.1</strong> adresleridir.</p>
+                    <p id="guide-login-pwd-desc">Kullanıcı adı genellikle <strong>admin</strong>, şifre ise <strong>admin</strong>, <strong>turktelekom</strong>, <strong>superonline</strong> veya modeminizin arkasındaki etikette yazılı olan şifredir.</p>
+                  </div>
+                </div>
+
+                <div class="guide-step">
+                  <div class="step-num">02</div>
+                  <div class="step-content">
+                    <h4>Kanal Seçimini "Otomatik" Yerine El ile Ayarlayın</h4>
+                    <p>Kablosuz Ayarlar sekmesine gidin. Burada 2.4 GHz ve 5 GHz ayarlarını göreceksiniz. Kanal ayarını **Auto (Otomatik)** modundan çıkarıp, uygulamamızın **Kanal Spektrumu** ekranında önerdiği en temiz kanala sabitleyin.</p>
+                    <ul>
+                      <li>**2.4 GHz için:** Sadece **1, 6 veya 11.** kanallardan birini seçin. Diğer kanallar komşu kanallarla çakışmaya neden olur.</li>
+                      <li>**5 GHz için:** Eğer yakında çok fazla ağ varsa DFS olmayan standart yüksek kanalları (örneğin **36, 40, 44 veya 48**) veya parazitsiz yüksek kanalları (örneğin **149, 153**) seçin.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="guide-step">
+                  <div class="step-num">03</div>
+                  <div class="step-content">
+                    <h4>Kanal Genişliğini (Bandwidth) Optimize Edin</h4>
+                    <p>Kanal genişliği ne kadar büyük olursa o kadar yüksek veri taşınabilir, ancak parazit ihtimali o oranda artar.</p>
+                    <ul>
+                      <li>**2.4 GHz:** Kesinlikle **20 MHz** olarak seçilmelidir. 40 MHz seçmek kanalları üst üste bindirir ve bağlantının sürekli kopmasına sebep olur.</li>
+                      <li>**5 GHz:** Temiz bir ortamda en yüksek hız için **80 MHz** veya **160 MHz** seçebilirsiniz. Eğer apartmanda çok fazla ağ varsa paraziti önlemek için **40 MHz** seçeneğine düşürmek daha kararlı bir internet sağlar.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="guide-step">
+                  <div class="step-num">04</div>
+                  <div class="step-content">
+                    <h4>DNS Sunucularını Güncelleyin</h4>
+                    <p>Modem içindeki veya bilgisayarınızdaki varsayılan operatör DNS'leri yerine, tepki süresi en hızlı olan küresel DNS'leri tercih edin. Bu işlem internet sitelerinin açılma hızını (çözümleme süresini) doğrudan iyileştirir.</p>
+                    <table class="dns-table">
+                      <thead>
+                        <tr>
+                          <th>DNS Sağlayıcı</th>
+                          <th>Birincil DNS (Preferred)</th>
+                          <th>İkincil DNS (Alternate)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><strong>Cloudflare (Önerilen)</strong></td>
+                          <td class="code">1.1.1.1</td>
+                          <td class="code">1.0.0.1</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Google DNS</strong></td>
+                          <td class="code">8.8.8.8</td>
+                          <td class="code">8.8.4.4</td>
+                        </tr>
+                        <tr>
+                          <td><strong>NextDNS (Güvenli)</strong></td>
+                          <td class="code">45.90.28.18</td>
+                          <td class="code">45.90.30.18</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="guide-step">
+                  <div class="step-num">05</div>
+                  <div class="step-content">
+                    <h4>Gelişmiş Kablosuz Özelliklerini Aktifleştirin</h4>
+                    <ul>
+                      <li>**WMM (Wi-Fi Multimedia) ve QoS:** Kesinlikle **Açık (Enabled)** olmalıdır. Bu özellik oyun, video ve ses dosyası paketlerini önceliklendirerek tıkanıklığı önler.</li>
+                      <li>**WPA3-Personal Güvenlik:** Eğer modeminize bağlı tüm cihazlarınız güncelse, şifreleme yöntemini en son standart olan **WPA3** olarak ayarlayın. Bu hem güvenliği artırır hem de veri paketlerinin daha hızlı işlenmesini sağlar.</li>
+                    </ul>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Yan Panel Hızlı Bilgi -->
+            <div class="content-card flex-1">
+              <div class="card-header">
+                <h3>Kritik Wi-Fi Kuralları</h3>
+              </div>
+              <div class="rules-box">
+                <div class="rule-card">
+                  <div class="r-badge danger">KURAL 1</div>
+                  <h5>Aynı SSID Adını Kullanın</h5>
+                  <p>2.4 GHz ve 5 GHz ağlarınızın isimlerini (SSID) ve şifrelerini tamamen aynı yapın. Böylece modern telefonlar ve bilgisayarlar, modeme yakınken otomatik olarak hızlı olan 5G bandına, uzaklaştığında ise kopmadan 2.4G bandına geçiş yapar (Band Steering).</p>
+                </div>
+                
+                <div class="rule-card">
+                  <div class="r-badge warning">KURAL 2</div>
+                  <h5>Duvarlar ve Engeller</h5>
+                  <p>Wi-Fi dalgaları metal, beton ve su dolu engellerden (örneğin kalorifer petekleri, akvaryumlar) geçemez. Modeminizi bu tür engellerin arkasına yerleştirmek çekim kalitesini %90'a varan oranda düşürür.</p>
+                </div>
+
+                <div class="rule-card">
+                  <div class="r-badge info">KURAL 3</div>
+                  <h5>Kanal Ayrımı</h5>
+                  <p>Modeminizin kanalını değiştirdikten sonra tüm cihazların yeni kanalı algılaması için modemi 1 defa kapatıp açmanız (reboot) önerilir.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- PANEL: GEÇMİŞ (HISTORY) -->
+        <section id="panel-history" class="content-panel">
+          <header class="panel-header">
+            <div>
+              <h2><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> Tarama Geçmişi</h2>
+              <p>Geçmiş Wi-Fi taramalarınız ve kanal doluluk trendleri.</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-outline" id="btn-export-html">HTML Raporu</button>
+              <button class="btn btn-outline" id="btn-export-json">JSON İndir</button>
+            </div>
+          </header>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-8">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">Saatlik Ağ Yoğunluğu Trendi (Son 7 Gün)</h3>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="historyChart" style="width:100%; height:300px;"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">En Yoğun Kanallar</h3>
+                  </div>
+                  <div class="card-body" id="channel-freq-list">
+                    <div class="empty-state" style="padding: 20px 0;">Yükleniyor...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- PANEL: AYARLAR (SETTINGS) -->
+        <section id="panel-settings" class="content-panel">
+          <header class="panel-header">
+            <div>
+              <h2><svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Ayarlar</h2>
+              <p>AeroNet tercihlerinizi ve arka plan hizmetlerini yapılandırın.</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-primary" id="btn-save-settings">Ayarları Kaydet</button>
+            </div>
+          </header>
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-6">
+                <div class="card">
+                  <div class="card-header"><h3 class="card-title">Genel Tercihler</h3></div>
+                  <div class="card-body">
+                    <div style="margin-bottom:15px;">
+                      <label style="display:block; margin-bottom:5px; color:var(--text-secondary); font-size:0.9rem;">Otomatik Tarama Aralığı (Saniye)</label>
+                      <select id="set-scan-interval" class="form-input" style="width:100%; padding:10px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:6px; outline:none;">
+                        <option value="30">30 Saniye (Hızlı)</option>
+                        <option value="60">60 Saniye (Normal)</option>
+                        <option value="300">5 Dakika (Pil Dostu)</option>
+                        <option value="0">Sadece Manuel</option>
+                      </select>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                      <label style="display:block; margin-bottom:5px; color:var(--text-secondary); font-size:0.9rem;">Veri Saklama Süresi (Gün)</label>
+                      <input type="number" id="set-retention" value="30" class="form-input" style="width:100%; padding:10px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:6px; outline:none;">
+                    </div>
+                    <div style="margin-bottom:15px;">
+                      <label style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" id="set-autolaunch" style="margin-right:10px; width:16px; height:16px; accent-color:var(--cyan);">
+                        <span style="font-size:0.95rem;">Windows açılışında otomatik başlat</span>
+                      </label>
+                      <small style="color:var(--text-muted); display:block; margin-left:26px; margin-top:3px;">System tray'de arka planda çalışmaya devam eder.</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="card">
+                  <div class="card-header"><h3 class="card-title">Akıllı Uyarılar (Native Notifications)</h3></div>
+                  <div class="card-body">
+                    <div style="margin-bottom:15px;">
+                      <label style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" id="set-alert-evil" style="margin-right:10px; width:16px; height:16px; accent-color:var(--cyan);">
+                        <span style="font-size:0.95rem;">Şüpheli Ağ (Evil Twin) Uyarıları</span>
+                      </label>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                      <label style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" id="set-alert-weak" style="margin-right:10px; width:16px; height:16px; accent-color:var(--cyan);">
+                        <span style="font-size:0.95rem;">Zayıf Sinyal Uyarısı</span>
+                      </label>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                      <label style="display:block; margin-bottom:5px; color:var(--text-secondary); font-size:0.9rem;">Kanal Doluluk Bildirim Eşiği (Yoğunluk Puanı)</label>
+                      <input type="number" id="set-alert-threshold" value="70" class="form-input" style="width:100%; padding:10px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:6px; outline:none;">
+                      <small style="color:var(--text-muted); display:block; margin-top:5px;">Belirtilen puan aşıldığında işletim sistemi bildirimi gösterilir.</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- PREMIUM MODAL: Siber Terminal Provizyon Ekranı (ADIM 5) -->
+  <div class="modal-overlay" id="provision-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); z-index: 1000; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease;">
+    <div class="modal-card" style="background: #090d16; border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 12px; width: 90%; max-width: 650px; box-shadow: 0 0 40px rgba(6, 182, 212, 0.15); display: flex; flex-direction: column; overflow: hidden;">
+      
+      <!-- Modal Header -->
+      <div class="modal-header" style="background: rgba(255,255,255,0.02); padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px #ef4444;"></div>
+          <div style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></div>
+          <div style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></div>
+          <h4 style="margin: 0 0 0 10px; font-family: var(--font-title); font-size: 0.85rem; letter-spacing: 1px; color: var(--text-primary); text-transform: uppercase;">AeroNet Secure Provisioning Terminal</h4>
+        </div>
+        <button class="btn-close" id="btn-close-provision" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center;">&times;</button>
+      </div>
+
+      <!-- Modal Body (Terminal Output) -->
+      <div class="modal-body" style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
+        
+        <!-- Terminal Connection Params Form (Before Execution) -->
+        <div id="provision-credentials-form">
+          <h5 style="margin: 0 0 8px 0; color: var(--text-primary); font-size: 0.9rem;">Modem SSH/API Yetkilendirme Bilgileri</h5>
+          <p style="margin: 0 0 15px 0; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">Optimizasyon ayarlarını otomatik olarak modeminize güvenli arayüzden göndermek için yönetim paneli şifrenizi girin. Bu bilgiler hiçbir şekilde sunucuya kaydedilmez ve saklanmaz.</p>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 12px;">
+             <div>
+               <label style="display: block; font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase;">Modem IP Adresi</label>
+               <input type="text" id="prov-ip" value="192.168.1.1" style="width: 100%; padding: 8px 12px; background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--text-primary); outline: none;">
+             </div>
+             <div>
+               <label style="display: block; font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase;">Modem Markası</label>
+               <input type="text" id="prov-brand" value="ASUS" disabled style="width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; color: var(--text-primary);">
+             </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+             <div>
+               <label style="display: block; font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase;">Arayüz Kullanıcı Adı</label>
+               <input type="text" id="prov-username" value="admin" style="width: 100%; padding: 8px 12px; background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--text-primary); outline: none;">
+             </div>
+             <div>
+               <label style="display: block; font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase;">Arayüz Şifresi</label>
+               <input type="password" id="prov-password" placeholder="Yönetim arayüzü şifresi" style="width: 100%; padding: 8px 12px; background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--text-primary); outline: none;">
+             </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px;">
+             <button class="btn btn-secondary" id="btn-cancel-provision">İptal Et</button>
+             <button class="btn btn-primary" id="btn-start-provision" style="background: var(--cyan); border: none; box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);">Bağlan ve Ayarları Gönder</button>
+          </div>
+        </div>
+
+        <!-- Live Terminal Console (Shown during and after execution) -->
+        <div id="provision-terminal-view" style="display: none; flex-direction: column; gap: 15px;">
+           <div id="terminal-screen" style="background: #030712; border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; font-family: monospace; font-size: 0.8rem; color: #34d399; height: 260px; overflow-y: auto; box-shadow: inset 0 0 15px rgba(0,0,0,0.8); line-height: 1.6;">
+             <!-- Console lines will append here dynamically -->
+           </div>
+           
+           <!-- Progress bar -->
+           <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;">
+             <div id="provision-progress" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--cyan) 0%, var(--emerald) 100%); transition: width 0.3s;"></div>
+           </div>
+
+           <div style="display: flex; justify-content: space-between; align-items: center;">
+             <span id="provision-status-lbl" style="font-size: 0.75rem; color: var(--text-secondary);">Modeme bağlanılıyor...</span>
+             <button class="btn btn-primary" id="btn-finish-provision" disabled style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); cursor: not-allowed; box-shadow: none;">Terminali Kapat</button>
+           </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./aeronet.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Settings {
+  id                    Int     @id @default(1)
+  scan_interval         Int     @default(60)
+  data_retention_days   Int     @default(30)
+  auto_launch           Boolean @default(false)
+  alert_evil_twin       Boolean @default(true)
+  alert_weak_signal     Boolean @default(true)
+  alert_channel_threshold Int   @default(70)
+}
+
+model NetworkScan {
+  id          Int      @id @default(autoincrement())
+  timestamp   DateTime @default(now())
+  ssid        String
+  bssid       String
+  channel     Int
+  frequency   Int
+  signal_level Int
+  security    String
+  band        String   // "2.4GHz", "5GHz", "6GHz"
+}
+
+model SpeedHistory {
+  id            Int      @id @default(autoincrement())
+  timestamp     DateTime @default(now())
+  download_mbps Float
+  upload_mbps   Float?
+  ping_ms       Float?
+  jitter_ms     Float?
+}

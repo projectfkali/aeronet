@@ -1,16 +1,16 @@
 const { app, BrowserWindow, Tray, Menu, nativeImage, shell, ipcMain, Notification } = require('electron');
 const path = require('path');
-const { fork } = require('child_process');
 const fs = require('fs');
+const wifi = require('node-wifi');
+const { PrismaClient } = require('@prisma/client');
 
-// ─── Ortam Ayarları ───────────────────────────────────────────────────────────
+const prisma = new PrismaClient();
+wifi.init({ iface: null });
+
 const isDev = !app.isPackaged;
-const PORT = 3000;
 
-// ─── Global Referanslar ───────────────────────────────────────────────────────
 let mainWindow = null;
 let tray = null;
-let serverProcess = null;
 let isQuitting = false;
 
 // ─── Pencere Durumu Kalıcılığı ────────────────────────────────────────────────
@@ -29,26 +29,6 @@ function saveWindowState(win) {
   fs.writeFileSync(windowStatePath, JSON.stringify(state));
 }
 
-// ─── Express Sunucusunu Fork Et ───────────────────────────────────────────────
-function startServer() {
-  const serverPath = path.join(__dirname, '..', 'server.js');
-  serverProcess = fork(serverPath, [], {
-    silent: true,
-    env: { ...process.env, PORT, ELECTRON_RUN_AS_NODE: '1' }
-  });
-
-  serverProcess.stdout?.on('data', (d) => console.log('[Server]', d.toString().trim()));
-  serverProcess.stderr?.on('data', (d) => console.error('[Server Error]', d.toString().trim()));
-
-  serverProcess.on('error', (err) => console.error('Sunucu başlatma hatası:', err));
-  serverProcess.on('exit', (code) => {
-    if (!isQuitting) {
-      console.warn(`Sunucu beklenmedik çıkış (${code}), yeniden başlatılıyor...`);
-      setTimeout(startServer, 2000);
-    }
-  });
-}
-
 // ─── Ana Pencere ──────────────────────────────────────────────────────────────
 function createWindow() {
   const state = loadWindowState();
@@ -60,7 +40,7 @@ function createWindow() {
     y: state.y,
     minWidth: 960,
     minHeight: 640,
-    title: 'AeroNet Wi-Fi Optimizer',
+    title: 'AeroNet Wi-Fi Optimizer Pro',
     icon: path.join(__dirname, '..', 'assets', 'icon.png'),
     backgroundColor: '#060a13',
     titleBarStyle: 'hidden',
@@ -77,22 +57,14 @@ function createWindow() {
     }
   });
 
-  // Express hazır olana kadar retry loop ile yükle
-  function loadWithRetry(attempt = 0) {
-    mainWindow.loadURL(`http://localhost:${PORT}`).catch(() => {
-      if (attempt < 15) {
-        setTimeout(() => loadWithRetry(attempt + 1), 800);
-      }
-    });
+  if (isDev) {
+    mainWindow.loadURL('http://localhost:5173');
+    mainWindow.webContents.openDevTools();
+  } else {
+    mainWindow.loadFile(path.join(__dirname, '..', 'dist-react', 'index.html'));
   }
-  setTimeout(() => loadWithRetry(), 1500);
 
   if (state.maximized) mainWindow.maximize();
-
-  // Splashscreen: sunucu hazır olmadan önce boş sayfa yerine loading göster
-  mainWindow.webContents.on('did-fail-load', () => {
-    setTimeout(() => mainWindow.loadURL(`http://localhost:${PORT}`), 800);
-  });
 
   mainWindow.on('close', (e) => {
     saveWindowState(mainWindow);
@@ -111,7 +83,6 @@ function createWindow() {
 
   mainWindow.on('closed', () => { mainWindow = null; });
 
-  // Harici linkleri sistem tarayıcısında aç
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
@@ -123,13 +94,10 @@ function createTray() {
   const iconPath = path.join(__dirname, '..', 'assets', 'icon.png');
   const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 16, height: 16 });
   tray = new Tray(trayIcon);
-  tray.setToolTip('AeroNet Wi-Fi Optimizer');
+  tray.setToolTip('AeroNet Wi-Fi Optimizer Pro');
 
   const buildMenu = () => Menu.buildFromTemplate([
-    {
-      label: '📡 AeroNet Wi-Fi Optimizer',
-      enabled: false
-    },
+    { label: '📡 AeroNet Wi-Fi Optimizer', enabled: false },
     { type: 'separator' },
     {
       label: '🖥️  Pencereyi Aç',
@@ -137,28 +105,7 @@ function createTray() {
         if (mainWindow) {
           mainWindow.show();
           mainWindow.focus();
-        } else {
-          createWindow();
-        }
-      }
-    },
-    {
-      label: '🔄  Şimdi Tara',
-      click: () => {
-        if (mainWindow) {
-          mainWindow.show();
-          mainWindow.webContents.executeJavaScript('window.fetchScanData && window.fetchScanData()');
-        }
-      }
-    },
-    { type: 'separator' },
-    {
-      label: '⚙️  Ayarlar',
-      click: () => {
-        if (mainWindow) {
-          mainWindow.show();
-          mainWindow.webContents.executeJavaScript("document.getElementById('btn-settings')?.click()");
-        }
+        } else createWindow();
       }
     },
     { type: 'separator' },
@@ -179,40 +126,71 @@ function createTray() {
   });
 }
 
-// ─── Windows Auto-Launch ──────────────────────────────────────────────────────
-function setAutoLaunch(enabled) {
-  const appName = 'AeroNet Wi-Fi Optimizer';
-  const exePath = process.execPath;
-
-  if (process.platform !== 'win32') return;
-
-  try {
-    const { execSync } = require('child_process');
-    if (enabled) {
-      execSync(`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "${appName}" /t REG_SZ /d "${exePath}" /f`);
-    } else {
-      execSync(`reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "${appName}" /f`);
-    }
-  } catch (e) {
-    console.warn('Auto-launch ayarı yapılamadı:', e.message);
-  }
-}
-
-function isAutoLaunchEnabled() {
-  try {
-    const { execSync } = require('child_process');
-    const result = execSync('reg query "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "AeroNet Wi-Fi Optimizer"').toString();
-    return result.includes('AeroNet');
-  } catch {
-    return false;
-  }
-}
-
 // ─── IPC Mesajları (Renderer ↔ Main) ─────────────────────────────────────────
-ipcMain.handle('get-auto-launch', () => isAutoLaunchEnabled());
-ipcMain.handle('set-auto-launch', (_, enabled) => {
-  setAutoLaunch(enabled);
-  return isAutoLaunchEnabled();
+
+ipcMain.handle('scan-wifi', async () => {
+  try {
+    const networks = await wifi.scan();
+    
+    // Map to AeroNet structure
+    const mapped = networks.map(nw => {
+      // 6GHz detection
+      let band = '2.4GHz';
+      let channel = nw.channel || 0;
+      
+      if (nw.frequency > 5000 && nw.frequency < 5900) {
+        band = '5GHz';
+      } else if (nw.frequency >= 5925) {
+        band = '6GHz';
+        // Basic map frequency to 6GHz channel
+        // Ch 1 = 5955, Ch 2 = 5960. (Freq - 5950) / 5
+        channel = Math.round((nw.frequency - 5950) / 5);
+      }
+
+      return {
+        ssid: nw.ssid || 'Gizli Ağ',
+        bssid: nw.bssid,
+        channel: channel,
+        frequency: nw.frequency || 0,
+        signal_level: nw.signal_level || 0,
+        quality: nw.quality || 0,
+        security: nw.security || 'Açık',
+        band: band
+      };
+    });
+
+    return { success: true, networks: mapped };
+  } catch (error) {
+    console.error('Scan Error:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('get-settings', async () => {
+  let settings = await prisma.settings.findFirst();
+  if (!settings) {
+    settings = await prisma.settings.create({ data: {} });
+  }
+  return settings;
+});
+
+ipcMain.handle('save-settings', async (_, data) => {
+  let settings = await prisma.settings.findFirst();
+  if (!settings) {
+    return prisma.settings.create({ data });
+  }
+  return prisma.settings.update({ where: { id: settings.id }, data });
+});
+
+ipcMain.handle('get-history', async () => {
+  return prisma.networkScan.findMany({
+    orderBy: { timestamp: 'desc' },
+    take: 100
+  });
+});
+
+ipcMain.handle('save-scan-history', async (_, data) => {
+  return prisma.networkScan.create({ data });
 });
 
 ipcMain.handle('show-notification', (_, { title, body, urgency }) => {
@@ -231,17 +209,15 @@ ipcMain.handle('show-notification', (_, { title, body, urgency }) => {
 });
 
 ipcMain.handle('open-external', (_, url) => shell.openExternal(url));
-
 ipcMain.handle('get-app-version', () => app.getVersion());
-
 ipcMain.handle('quit-app', () => {
   isQuitting = true;
   app.quit();
 });
-
 ipcMain.handle('minimize-to-tray', () => {
   if (mainWindow) mainWindow.hide();
 });
+
 
 // ─── Uygulama Yaşam Döngüsü ──────────────────────────────────────────────────
 const gotTheLock = app.requestSingleInstanceLock();
@@ -257,21 +233,17 @@ if (!gotTheLock) {
   });
 
   app.whenReady().then(() => {
-    startServer();
     createWindow();
     createTray();
   });
 
   app.on('window-all-closed', (e) => {
-    // Windows/Linux'ta tüm pencereler kapanınca uygulamayı bitirme (tray'de devam et)
     if (process.platform !== 'darwin') e.preventDefault();
   });
 
-  app.on('before-quit', () => {
+  app.on('before-quit', async () => {
     isQuitting = true;
-    if (serverProcess) {
-      serverProcess.kill();
-    }
+    await prisma.$disconnect();
   });
 
   app.on('activate', () => {
