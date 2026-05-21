@@ -1,0 +1,92 @@
+{
+  "name": "aeronet-wifi-optimizer",
+  "version": "2.0.0",
+  "description": "Premium Wi-Fi Analyzer & Optimizer — Native Desktop",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "server": "node server.js",
+    "dist": "electron-builder --win --x64",
+    "dist:portable": "electron-builder --win portable --x64"
+  },
+  "keywords": [
+    "wifi",
+    "analyzer",
+    "optimizer",
+    "heatmap",
+    "channels",
+    "netsh",
+    "electron"
+  ],
+  "author": "AeroNet",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "iconv-lite": "^0.6.3",
+    "nedb-promises": "^6.2.1"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.aeronet.wifi-optimizer",
+    "productName": "AeroNet Wi-Fi Optimizer",
+    "copyright": "Copyright © 2024 AeroNet",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**/*",
+      "public/**/*",
+      "db/**/*",
+      "assets/**/*",
+      "server.js",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "assets",
+        "to": "assets",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AeroNet Wi-Fi Optimizer",
+      "installerHeaderIcon": "assets/icon.png"
+    },
+    "portable": {
+      "artifactName": "AeroNet-WiFi-Optimizer-Portable.exe"
+    },
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/better-sqlite3/**/*"
+    ]
+  }
+}

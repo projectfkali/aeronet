@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroNet - Mobil Ölçüm Terminali</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #080c16;
+      --bg-card: rgba(13, 20, 38, 0.7);
+      --primary: #6366f1;
+      --cyan: #06b6d4;
+      --emerald: #10b981;
+      --warning: #f59e0b;
+      --crimson: #ef4444;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --font-title: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Glows */
+    .glow {
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.2;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .glow-1 { background: var(--primary); top: -50px; right: -50px; }
+    .glow-2 { background: var(--cyan); bottom: -50px; left: -50px; }
+
+    .container {
+      width: 100%;
+      max-width: 450px;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 5px;
+    }
+
+    .logo-container {
+      background: linear-gradient(135deg, var(--primary), var(--cyan));
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px auto;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+
+    header h1 {
+      font-family: var(--font-title);
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    header p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    .card h3 {
+      font-family: var(--font-title);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .field-group {
+      margin-bottom: 16px;
+    }
+
+    .field-group label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-control {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .input-control:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 8px rgba(6, 182, 212, 0.2);
+    }
+
+    /* Floor Toggle Buttons */
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px;
+      color: var(--text-secondary);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .toggle-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Map Room Selector Container */
+    .room-map-card {
+      padding: 15px;
+    }
+
+    .map-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 10px;
+      border: 1px dashed rgba(255, 255, 255, 0.05);
+    }
+
+    .room-button {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 20px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .room-button.active {
+      background: rgba(6, 182, 212, 0.08);
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.15);
+    }
+
+    .room-button.active span.room-name {
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    .room-button span.room-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .room-button span.room-coords {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    /* Signal Gauge Slider */
+    .gauge-display {
+      text-align: center;
+      margin: 15px 0;
+    }
+
+    .dbm-text {
+      font-family: var(--font-title);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--emerald);
+      text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+      display: block;
+    }
+
+    .dbm-status {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-top: 2px;
+      display: block;
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      height: 6px;
+      border-radius: 3px;
+      outline: none;
+      margin: 15px 0;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--cyan);
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
+      transition: transform 0.1s;
+    }
+
+    input[type=range]::-webkit-slider-thumb:active {
+      transform: scale(1.2);
+    }
+
+    .btn-sync {
+      width: 100%;
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--primary) 100%);
+      border: none;
+      padding: 14px;
+      color: #fff;
+      border-radius: 12px;
+      font-family: var(--font-title);
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(6, 182, 212, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-sync:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 10px rgba(6, 182, 212, 0.2);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(16, 185, 129, 0.9);
+      backdrop-filter: blur(8px);
+      padding: 12px 24px;
+      border-radius: 30px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.85rem;
+      z-index: 100;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.error {
+      background: rgba(239, 68, 68, 0.9);
+    }
+
+    .toast-icon {
+      margin-right: 6px;
+    }
+
+  </style>
+</head>
+<body>
+  
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+
+  <div class="container">
+    
+    <header>
+      <div class="logo-container">
+        <svg viewBox="0 0 24 24" width="26" height="26" stroke="#ffffff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+          <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+          <circle cx="12" cy="20" r="1" fill="#ffffff"></circle>
+        </svg>
+      </div>
+      <h1>AeroNet Mobile</h1>
+      <p>Gerçek zamanlı sinyal kalibrasyon terminali</p>
+    </header>
+
+    <!-- Adım 1: Cihaz ve Bağlantı Parametreleri -->
+    <div class="card">
+      <h3>
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--cyan)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+        Cihaz Tanımlama
+      </h3>
+      <div class="field-group">
+        <label for="device-select">İstemci Cihaz</label>
+        <select id="device-select" class="input-control">
+          <option value="iPhone 15 Pro">📱 iPhone 15 Pro (Wi-Fi 6E)</option>
+          <option value="Galaxy S24 Ultra">📱 Galaxy S24 Ultra (Wi-Fi 7)</option>
+          <option value="MacBook Pro 16">💻 MacBook Pro 16" (M3 Max)</option>
+          <option value="Xiaomi Pad 6">平板 Xiaomi Pad 6</option>
+          <option value="Google Pixel 8">📱 Google Pixel 8 Pro</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label for="ssid-input">Bağlı Wi-Fi Ağ Adı (SSID)</label>
+        <input type="text" id="ssid-input" class="input-control" value="AeroNet_Fast_5G">
+      </div>
+      <div class="field-group" style="margin-bottom: 0;">
+        <label>Kat Seviyesi</label>
+        <div class="btn-group">
+          <button class="toggle-btn active" data-floor="0">Zemin Kat</button>
+          <button class="toggle-btn" data-floor="1">1. Kat (Dubleks)</button>
+          <button class="toggle-btn" data-floor="2">2. Kat</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Adım 2: Haritada Konum Seç -->
+    <div class="card room-map-card">
+      <h3>
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--violet)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        Bulunduğunuz Odayı Seçin
+      </h3>
+      <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.35;">Eviniz içinde şu an fiziksel olarak bulunduğunuz konuma tıklayarak dBm ölçümünü eşleştirin.</p>
+      
+      <div class="map-grid">
+        <div class="room-button active" data-room="Salon" data-x="180" data-y="130">
+          <span class="room-name">🛋️ Salon</span>
+          <span class="room-coords">(180, 130)</span>
+        </div>
+        <div class="room-button" data-room="Mutfak" data-x="520" data-y="130">
+          <span class="room-name">🍳 Mutfak</span>
+          <span class="room-coords">(520, 130)</span>
+        </div>
+        <div class="room-button" data-room="Yatak Odası" data-x="180" data-y="380">
+          <span class="room-name">🛏️ Yatak Odası</span>
+          <span class="room-coords">(180, 380)</span>
+        </div>
+        <div class="room-button" data-room="Çalışma Odası" data-x="520" data-y="380">
+          <span class="room-name">💻 Çalışma Odası</span>
+          <span class="room-coords">(520, 380)</span>
+        </div>
+        <div class="room-button" data-room="Koridor" data-x="350" data-y="255">
+          <span class="room-name">🚶 Koridor</span>
+          <span class="room-coords">(350, 255)</span>
+        </div>
+        <div class="room-button" data-room="Balkon" data-x="80" data-y="240">
+          <span class="room-name">🪴 Balkon</span>
+          <span class="room-coords">(80, 240)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Adım 3: Sinyal Ölçüm Değeri -->
+    <div class="card">
+      <h3>
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--emerald)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+        dBm Sinyal Seviyesi Ölçümü
+      </h3>
+      <div class="gauge-display">
+        <span class="dbm-text" id="dbm-value">-48 dBm</span>
+        <span class="dbm-status" id="dbm-status">MÜKEMMEL</span>
+      </div>
+      
+      <input type="range" id="dbm-slider" min="-95" max="-30" value="-48">
+      
+      <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.45; text-align: center; margin-bottom: 15px;">
+        Not: -30 dBm modemin hemen yanındaki en yüksek gücü, -95 dBm ise bağlantının koptuğu en zayıf sinyali temsil eder.
+      </p>
+
+      <button class="btn-sync" id="btn-sync">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+        Masaüstüne Senkronize Et
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Toast Uyarısı -->
+  <div class="toast" id="sync-toast">
+    <span class="toast-icon">✔</span>
+    <span id="toast-text">Başarıyla senkronize edildi!</span>
+  </div>
+
+  <script>
+    // Elements
+    const dbmSlider = document.getElementById('dbm-slider');
+    const dbmValueEl = document.getElementById('dbm-value');
+    const dbmStatusEl = document.getElementById('dbm-status');
+    const btnSync = document.getElementById('btn-sync');
+    const toast = document.getElementById('sync-toast');
+    const toastText = document.getElementById('toast-text');
+    const deviceSelect = document.getElementById('device-select');
+    const ssidInput = document.getElementById('ssid-input');
+
+    // Room Selection
+    let activeX = 180;
+    let activeY = 130;
+    let activeRoomName = "Salon";
+    document.querySelectorAll('.room-button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.room-button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeX = parseFloat(btn.dataset.x);
+        activeY = parseFloat(btn.dataset.y);
+        activeRoomName = btn.dataset.room;
+      });
+    });
+
+    // Floor Selection
+    let activeFloor = 0;
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFloor = parseInt(btn.dataset.floor);
+      });
+    });
+
+    // Slider Event
+    function updateDbmStatus(val) {
+      dbmValueEl.textContent = `${val} dBm`;
+      if (val >= -50) {
+        dbmStatusEl.textContent = "MÜKEMMEL (Sinyal kaybı yok)";
+        dbmStatusEl.style.color = "var(--emerald)";
+        dbmValueEl.style.color = "var(--emerald)";
+        dbmValueEl.style.textShadow = "0 0 10px rgba(16, 185, 129, 0.3)";
+      } else if (val >= -70) {
+        dbmStatusEl.textContent = "İYİ (Kararlı bağlantı)";
+        dbmStatusEl.style.color = "var(--cyan)";
+        dbmValueEl.style.color = "var(--cyan)";
+        dbmValueEl.style.textShadow = "0 0 10px rgba(6, 182, 212, 0.3)";
+      } else if (val >= -85) {
+        dbmStatusEl.textContent = "ZAYIF (Hız düşüşü yaşanabilir)";
+        dbmStatusEl.style.color = "var(--warning)";
+        dbmValueEl.style.color = "var(--warning)";
+        dbmValueEl.style.textShadow = "0 0 10px rgba(245, 158, 11, 0.3)";
+      } else {
+        dbmStatusEl.textContent = "KRİTİK / KOPUYOR (Ölü Nokta)";
+        dbmStatusEl.style.color = "var(--crimson)";
+        dbmValueEl.style.color = "var(--crimson)";
+        dbmValueEl.style.textShadow = "0 0 10px rgba(239, 68, 68, 0.3)";
+      }
+    }
+
+    dbmSlider.addEventListener('input', (e) => {
+      updateDbmStatus(parseInt(e.target.value));
+    });
+
+    // Sync Event
+    btnSync.addEventListener('click', async () => {
+      const payload = {
+        x: activeX,
+        y: activeY,
+        dbm: parseInt(dbmSlider.value),
+        ssid: ssidInput.value,
+        device: deviceSelect.value,
+        floor: activeFloor
+      };
+
+      try {
+        const response = await fetch('/api/mobile/sync', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          showToast(`✔ ${activeRoomName} ölçümü (${payload.dbm} dBm) başarıyla aktarıldı!`);
+        } else {
+          showToast("❌ Eşleştirme hatası oluştu.", true);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("❌ Sunucuya bağlanılamadı.", true);
+      }
+    });
+
+    function showToast(message, isError = false) {
+      toastText.textContent = message;
+      if (isError) {
+        toast.classList.add('error');
+        toast.querySelector('.toast-icon').textContent = "❌";
+      } else {
+        toast.classList.remove('error');
+        toast.querySelector('.toast-icon').textContent = "✔";
+      }
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
