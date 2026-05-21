@@ -96,7 +96,3 @@ AeroNet gücünü topluluktan alır. Kod tabanını inceleyin, özellikleri test
 ## 📜 Lisans & Telif
 Bu proje **[MIT Lisansı](LICENSE)** ile güvence altına alınmıştır. Dilediğiniz gibi kullanabilir, değiştirebilir ve dağıtabilirsiniz. Daha fazla detay için LICENSE dosyasına göz atın.
 
----
-<div align="center">
-  <sub>❤️ ile açık kaynak topluluğu için geliştirilmiştir.</sub>
-</div>
