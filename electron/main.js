@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, nativeImage, shell, ipcMain, Notification } = require('electron');
+const { app, BrowserWindow, Tray, Menu, nativeImage, shell, ipcMain, Notification, protocol, net } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const wifi = require('node-wifi');
@@ -90,9 +90,12 @@ function createWindow() {
     }
   });
 
-  // Force load local file for debugging
-  mainWindow.loadFile(path.join(__dirname, '..', 'dist-react', 'index.html'));
-  mainWindow.webContents.openDevTools();
+  if (isDev) {
+    mainWindow.loadURL('http://localhost:5173');
+    mainWindow.webContents.openDevTools();
+  } else {
+    mainWindow.loadFile(path.join(__dirname, '..', 'dist-react', 'index.html'));
+  }
 
   if (state.maximized) mainWindow.maximize();
 
