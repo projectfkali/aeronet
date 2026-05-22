@@ -2,12 +2,44 @@ const { app, BrowserWindow, Tray, Menu, nativeImage, shell, ipcMain, Notificatio
 const path = require('path');
 const fs = require('fs');
 const wifi = require('node-wifi');
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
-wifi.init({ iface: null });
+const Database = require('better-sqlite3');
 
 const isDev = !app.isPackaged;
+const dbPath = isDev ? path.join(__dirname, '..', 'aeronet.db') : path.join(app.getPath('userData'), 'aeronet.db');
+const db = new Database(dbPath);
+
+// Initialize DB schema
+db.exec(`
+  CREATE TABLE IF NOT EXISTS Settings (
+    id INTEGER PRIMARY KEY DEFAULT 1,
+    scan_interval INTEGER DEFAULT 60,
+    data_retention_days INTEGER DEFAULT 30,
+    auto_launch BOOLEAN DEFAULT 0,
+    alert_evil_twin BOOLEAN DEFAULT 1,
+    alert_weak_signal BOOLEAN DEFAULT 1,
+    alert_channel_threshold INTEGER DEFAULT 70
+  );
+  
+  CREATE TABLE IF NOT EXISTS NetworkScan (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ssid TEXT,
+    bssid TEXT,
+    channel INTEGER,
+    frequency INTEGER,
+    signal_level INTEGER,
+    security TEXT,
+    band TEXT
+  );
+`);
+
+// Create default settings if empty
+const checkSettings = db.prepare('SELECT * FROM Settings WHERE id = 1').get();
+if (!checkSettings) {
+  db.prepare('INSERT INTO Settings (id) VALUES (1)').run();
+}
+
+wifi.init({ iface: null });
 
 let mainWindow = null;
 let tray = null;
@@ -166,31 +198,51 @@ ipcMain.handle('scan-wifi', async () => {
   }
 });
 
-ipcMain.handle('get-settings', async () => {
-  let settings = await prisma.settings.findFirst();
-  if (!settings) {
-    settings = await prisma.settings.create({ data: {} });
-  }
-  return settings;
+ipcMain.handle('get-settings', () => {
+  return db.prepare('SELECT * FROM Settings WHERE id = 1').get();
 });
 
-ipcMain.handle('save-settings', async (_, data) => {
-  let settings = await prisma.settings.findFirst();
-  if (!settings) {
-    return prisma.settings.create({ data });
-  }
-  return prisma.settings.update({ where: { id: settings.id }, data });
-});
-
-ipcMain.handle('get-history', async () => {
-  return prisma.networkScan.findMany({
-    orderBy: { timestamp: 'desc' },
-    take: 100
+ipcMain.handle('save-settings', (_, data) => {
+  const stmt = db.prepare(`
+    UPDATE Settings SET 
+      scan_interval = @scan_interval,
+      data_retention_days = @data_retention_days,
+      auto_launch = @auto_launch,
+      alert_evil_twin = @alert_evil_twin,
+      alert_weak_signal = @alert_weak_signal,
+      alert_channel_threshold = @alert_channel_threshold
+    WHERE id = 1
+  `);
+  stmt.run({
+    scan_interval: data.scan_interval || 60,
+    data_retention_days: data.data_retention_days || 30,
+    auto_launch: data.auto_launch ? 1 : 0,
+    alert_evil_twin: data.alert_evil_twin ? 1 : 0,
+    alert_weak_signal: data.alert_weak_signal ? 1 : 0,
+    alert_channel_threshold: data.alert_channel_threshold || 70
   });
+  return true;
 });
 
-ipcMain.handle('save-scan-history', async (_, data) => {
-  return prisma.networkScan.create({ data });
+ipcMain.handle('get-history', () => {
+  return db.prepare('SELECT * FROM NetworkScan ORDER BY timestamp DESC LIMIT 100').all();
+});
+
+ipcMain.handle('save-scan-history', (_, data) => {
+  const stmt = db.prepare(`
+    INSERT INTO NetworkScan (ssid, bssid, channel, frequency, signal_level, security, band)
+    VALUES (@ssid, @bssid, @channel, @frequency, @signal_level, @security, @band)
+  `);
+  stmt.run({
+    ssid: data.ssid || 'Gizli Ağ',
+    bssid: data.bssid || '',
+    channel: data.channel || 0,
+    frequency: data.frequency || 0,
+    signal_level: data.signal_level || 0,
+    security: data.security || 'Açık',
+    band: data.band || '2.4GHz'
+  });
+  return true;
 });
 
 ipcMain.handle('show-notification', (_, { title, body, urgency }) => {
@@ -241,9 +293,9 @@ if (!gotTheLock) {
     if (process.platform !== 'darwin') e.preventDefault();
   });
 
-  app.on('before-quit', async () => {
+  app.on('before-quit', () => {
     isQuitting = true;
-    await prisma.$disconnect();
+    db.close();
   });
 
   app.on('activate', () => {
