@@ -8,6 +8,15 @@
     <link rel="stylesheet" href="/public/style.css" />
   </head>
   <body>
+    <div id="error-log" style="color: red; padding: 20px; font-family: monospace; white-space: pre-wrap;"></div>
+    <script>
+      window.onerror = function(message, source, lineno, colno, error) {
+        document.getElementById('error-log').innerText += message + '\n' + source + ':' + lineno + '\n' + (error ? error.stack : '') + '\n\n';
+      };
+      window.addEventListener('unhandledrejection', function(event) {
+        document.getElementById('error-log').innerText += 'Unhandled Promise: ' + event.reason + '\n\n';
+      });
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

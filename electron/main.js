@@ -85,16 +85,14 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: false,
+      webSecurity: false // Disable CORS for file:// protocol
     }
   });
 
-  if (isDev) {
-    mainWindow.loadURL('http://localhost:5173');
-    mainWindow.webContents.openDevTools();
-  } else {
-    mainWindow.loadFile(path.join(__dirname, '..', 'dist-react', 'index.html'));
-  }
+  // Force load local file for debugging
+  mainWindow.loadFile(path.join(__dirname, '..', 'dist-react', 'index.html'));
+  mainWindow.webContents.openDevTools();
 
   if (state.maximized) mainWindow.maximize();
 
